@@ -1,9 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-
+// TODO: Move creds to env variables
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC0KhtG-uU6u-VqfglrZmDc3570dCw12TY",
@@ -18,3 +20,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
+export const auth = getAuth(app);
+// (async () => {
+//   await setPersistence(auth, browserLocalPersistence);
+// })();
+export default app;

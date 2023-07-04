@@ -11,13 +11,38 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
+import { auth } from '../../config/firebase';
+import { useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 export default function MenuAppBar() {
-  const [auth, setAuth] = React.useState(true);
+  const [loggedIn, setLoggedIn] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [userName, setUserName] = React.useState("");
+  const navigate = useNavigate();
+
+  React.useEffect(()=>{
+      onAuthStateChanged(auth, (user) => {
+          if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            const uid = user.uid;
+            // ...
+            console.log("uid", uid)
+            setLoggedIn(true);
+            setUserName(user.displayName);
+          } else {
+            // User is signed out
+            // ...
+            console.log("user is logged out")
+            setLoggedIn(false);
+            navigate('/login');
+          }
+        });
+  })
 
   const handleChange = (event) => {
-    setAuth(event.target.checked);
+    setLoggedIn(event.target.checked);
   };
 
   const handleMenu = (event) => {
@@ -27,6 +52,17 @@ export default function MenuAppBar() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const logout = () => {
+    setAnchorEl(null);
+    signOut(auth).then(() => {
+      // Sign-out successful.
+          navigate("/login");
+          console.log("Signed out successfully")
+      }).catch((error) => {
+      // An error happened.
+      });
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -40,12 +76,12 @@ export default function MenuAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <MenuIcon />
+            
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Easy Track
           </Typography>
-          {auth && (
+          {loggedIn && (
             <div>
               <IconButton
                 size="large"
@@ -72,8 +108,8 @@ export default function MenuAppBar() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={()=> {}}>Hi {userName}!</MenuItem>
+                <MenuItem onClick={logout}>Logout</MenuItem>
               </Menu>
             </div>
           )}
